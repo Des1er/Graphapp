@@ -1,6 +1,14 @@
 import React from 'react';
 
-const NodeSettings = ({ nodeColor, onNodeColorChange, nodeShape, onNodeShapeChange, onApplyChanges }) => {
+interface NodeSettingsProps {
+  nodeColor: string;
+  onNodeColorChange: React.ChangeEventHandler<HTMLInputElement>;
+  nodeShape: 'ellipse' | 'triangle' | 'rectangle' | 'diamond';
+  onNodeShapeChange: React.ChangeEventHandler<HTMLSelectElement>;
+  onApplyChanges: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+const NodeSettings: React.FC<NodeSettingsProps> = ({ nodeColor, onNodeColorChange, nodeShape, onNodeShapeChange, onApplyChanges }) => {
   return (
     <div>
       <h3>Node Settings</h3>
@@ -25,3 +33,4 @@ const NodeSettings = ({ nodeColor, onNodeColorChange, nodeShape, onNodeShapeChan
 };
 
 export default NodeSettings;
+

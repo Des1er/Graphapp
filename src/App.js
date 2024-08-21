@@ -2,7 +2,7 @@
 import React from 'react';
 import './App.css';
 import './tailwind.css';
-import GraphComponent from './graph';
+import GraphComponent from './graph.tsx';
 
 function App() {
   return (
