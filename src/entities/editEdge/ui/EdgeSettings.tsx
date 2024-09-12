@@ -1,40 +1,17 @@
 import React from 'react';
+import { edgeDirections, EdgeSettingsProps , edgeTypes, lineStyles, edgeAttributes} from '../model/types.tsx';
 
-interface Attribute {
-    value: string;
-    label: string;
-}
 
-interface EdgeSettingsProps {
-    edgeThickness: number;
-    onThicknessChange: React.ChangeEventHandler<HTMLInputElement>;
-    attributes: Attribute[];
-    selectedAttribute: string;
-    onAttributeChange: React.ChangeEventHandler<HTMLSelectElement>;
-    edgeTypes: Attribute[];
-    selectedEdgeType: string;
-    onEdgeTypeChange: React.ChangeEventHandler<HTMLSelectElement>;
-    edgeDirections: Attribute[];
-    selectedEdgeDirection: string;
-    onEdgeDirectionChange: React.ChangeEventHandler<HTMLSelectElement>;
-    lineStyles: Attribute[];
-    selectedLineStyle: string;
-    onLineStyleChange: React.ChangeEventHandler<HTMLSelectElement>;
-    onApplyChanges: React.MouseEventHandler<HTMLButtonElement>;
-}
 
 const EdgeSettings: React.FC<EdgeSettingsProps> = ({
-    edgeThickness, onThicknessChange,
-    attributes,
+    edgeThickness,
+    onThicknessChange,
     selectedAttribute,
     onAttributeChange,
-    edgeTypes,
     selectedEdgeType,
     onEdgeTypeChange,
-    edgeDirections,
     selectedEdgeDirection,
     onEdgeDirectionChange,
-    lineStyles,
     selectedLineStyle,
     onLineStyleChange,
     onApplyChanges
@@ -45,7 +22,7 @@ const EdgeSettings: React.FC<EdgeSettingsProps> = ({
                 <label>Select Edge Attribute: </label>
                 <select onChange={onAttributeChange} value={selectedAttribute}>
                     <option value="">Select an attribute</option>
-                    {attributes.map(attr => (
+                    {edgeAttributes.map(attr => (
                         <option key={attr.value} value={attr.value}>{attr.label}</option>
                     ))}
                 </select>

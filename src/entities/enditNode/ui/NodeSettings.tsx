@@ -1,12 +1,7 @@
 import React from 'react';
+import { NodeSettingsProps } from '../model/types';
 
-interface NodeSettingsProps {
-  nodeColor: string;
-  onNodeColorChange: React.ChangeEventHandler<HTMLInputElement>;
-  nodeShape: 'ellipse' | 'triangle' | 'rectangle' | 'diamond';
-  onNodeShapeChange: React.ChangeEventHandler<HTMLSelectElement>;
-  onApplyChanges: React.MouseEventHandler<HTMLButtonElement>;
-}
+
 
 const NodeSettings: React.FC<NodeSettingsProps> = ({ nodeColor, onNodeColorChange, nodeShape, onNodeShapeChange, onApplyChanges }) => {
   return (

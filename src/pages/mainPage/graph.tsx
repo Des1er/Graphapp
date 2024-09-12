@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
-import EdgeSettings from './EdgeSettings.tsx';
-import NodeSettings from './NodeSettings.tsx';
 import screenfull from 'screenfull';
+import GraphUI from './ui/ui.tsx';
 
-type NodeShape = "ellipse" | "triangle" | "rectangle" | "diamond";
 
 
 const initialData = {
@@ -17,35 +15,14 @@ const initialData = {
   edges: []
 };
 
-const edgeAttributes = [
-  { value: 'hosted_on', label: 'Hosted on' },
-  { value: 'depends_on', label: 'Depends on' },
-  { value: 'communicates_with', label: 'Communicates with' }
-];
 
-const edgeTypes = [
-  { value: 'dependency', label: 'Dependency' },
-  { value: 'influence', label: 'Influence' }
-];
 
-const edgeDirections = [
-  { value: 'forward', label: 'Forward' },
-  { value: 'backward', label: 'Backward' },
-  { value: 'both', label: 'Both Directions' }
-];
-
-const lineStyles = [
-  { value: 'solid', label: 'Solid' },
-  { value: 'dashed', label: 'Dashed' }
-];
 
 const GraphComponent: React.FC = () => {
 
   const [selectedNode, setSelectedNode] = useState<cytoscape.NodeSingular | null>(null);
   const [nodeColor, setNodeColor] = useState<string>('#666');
-  const [nodeShape, setNodeShape] = useState<'ellipse' | 'triangle' | 'rectangle' | 'diamond'>('ellipse');
-
-
+  const [nodeShape, setNodeShape] = useState<string>('');
   const [elements, setElements] = useState<cytoscape.ElementDefinition[]>(CytoscapeComponent.normalizeElements(initialData));
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
@@ -187,11 +164,8 @@ const GraphComponent: React.FC = () => {
           source: selectedNodes[0],
           target: selectedNodes[1],
           width: 2,
-          type: selectedEdgeType,
-          attribute: selectedAttribute,
-          direction: selectedEdgeDirection,
           lineStyle: 'solid',
-          label: edgeAttributes.find(attr => attr.value === selectedAttribute)?.label || 'New Edge'
+          label: 'New Edge'
         }
       };
       setElements(prevElements => [...prevElements, newEdge]);
@@ -211,7 +185,7 @@ const GraphComponent: React.FC = () => {
         type: selectedEdgeType,
         direction: selectedEdgeDirection,
         lineStyle: selectedLineStyle,
-        label: edgeAttributes.find(attr => attr.value === selectedAttribute)?.label || 'Updated Edge'
+        label: selectedAttribute
       };
 
       setElements(elements => elements.map(el => {
@@ -360,7 +334,7 @@ const GraphComponent: React.FC = () => {
   };
 
   const handleNodeShapeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setNodeShape(event.target.value as 'ellipse' | 'triangle' | 'rectangle' | 'diamond');
+    setNodeShape(event.target.value);
 };
 
 
@@ -442,96 +416,43 @@ const GraphComponent: React.FC = () => {
           }
         ]}
       />
-      <button
-        onClick={toggleFullScreen}
-        className="absolute bottom-9 right-4 p-2 bg-blue-500 text-white rounded shadow"
-        title="Toggle Full Screen"
-      >
-        {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
-      </button>
 
-      {showNodeEditor &&  (
-        <NodeSettings
-          nodeColor={nodeColor}
-          onNodeColorChange={handleNodeColorChange}
-          nodeShape={nodeShape}
-          onNodeShapeChange={handleNodeShapeChange}
-          onApplyChanges={applyNodeChanges}
-        />
-      )}
-      {showEdgeEditor && (
-        <EdgeSettings
-          edgeThickness={edgeThickness}
-          onThicknessChange={handleThicknessChange}
-          attributes={edgeAttributes}
-          selectedAttribute={selectedAttribute}
-          onAttributeChange={handleAttributeChange}
-          edgeTypes={edgeTypes}
-          selectedEdgeType={selectedEdgeType}
-          onEdgeTypeChange={handleEdgeTypeChange}
-          edgeDirections={edgeDirections}
-          selectedEdgeDirection={selectedEdgeDirection}
-          onEdgeDirectionChange={handleEdgeDirectionChange}
-          lineStyles={lineStyles}
-          selectedLineStyle={selectedLineStyle}
-          onLineStyleChange={handleLineStyleChange}
-          onApplyChanges={applyEdgeChanges}
-        />
-      )}
+<GraphUI
+        isFullScreen={isFullScreen}
+        toggleFullScreen={toggleFullScreen}
+        showNodeEditor={showNodeEditor}
+        nodeColor={nodeColor}
+        handleNodeColorChange={handleNodeColorChange}
+     
+        handleNodeShapeChange={handleNodeShapeChange}
+        applyNodeChanges={applyNodeChanges}
+        showEdgeEditor={showEdgeEditor}
+        edgeThickness={edgeThickness}
+        handleThicknessChange={handleThicknessChange}
 
-      {tooltip && (
-          <div
-          className="absolute left-10 top-10 bg-black text-white p-1 rounded pointer-events-none"
-          style={{ left: tooltip.x + 10, top: tooltip.y + 10 }}
-        >
-            {tooltipContent}
-          </div>
-        )}
-        {edgeTooltip && (
-          <div
-          className="absolute left-10 top-10 bg-black text-white p-1 rounded pointer-events-none"
-          style={{ left: edgeTooltip.x + 10, top: edgeTooltip.y + 10 }}
-          >
-            {edgeTooltipContent}
-          </div>
-        )}
+        selectedAttribute={selectedAttribute}
+        handleAttributeChange={handleAttributeChange}
 
-      <div className="absolute top-2 right-1 w-72 p-2 border border-gray-300 bg-white" title="Control Panel">
-        <div className="flex flex-col gap-2">
-          <button onClick={startNodeSelection} className="p-2 bg-blue-500 text-white rounded">Select Nodes to Create Edge</button>
-          <button onClick={createEdge} disabled={selectedNodes.length < 2} className="p-2 bg-blue-500 text-white rounded">Create Edge</button>
-          <button onClick={createAutomaticEdges} className="p-2 bg-blue-500 text-white rounded">Create Automatic Edges</button>
-          <div>Selected Nodes: {selectedNodes.join(', ')}</div>
-          {showNodeEditor && (
-            <NodeSettings
-              nodeColor={nodeColor}
-              onNodeColorChange={handleNodeColorChange}
-              nodeShape={nodeShape}
-              onNodeShapeChange={handleNodeShapeChange}
-              onApplyChanges={applyNodeChanges}
-            />
-          )}
-          {showEdgeEditor && (
-            <EdgeSettings
-              edgeThickness={edgeThickness}
-              onThicknessChange={handleThicknessChange}
-              attributes={edgeAttributes}
-              selectedAttribute={selectedAttribute}
-              onAttributeChange={handleAttributeChange}
-              edgeTypes={edgeTypes}
-              selectedEdgeType={selectedEdgeType}
-              onEdgeTypeChange={handleEdgeTypeChange}
-              edgeDirections={edgeDirections}
-              selectedEdgeDirection={selectedEdgeDirection}
-              onEdgeDirectionChange={handleEdgeDirectionChange}
-              lineStyles={lineStyles}
-              selectedLineStyle={selectedLineStyle}
-              onLineStyleChange={handleLineStyleChange}
-              onApplyChanges={applyEdgeChanges}
-            />
-          )}
-        </div>
-      </div>
+        selectedEdgeType={selectedEdgeType}
+        handleEdgeTypeChange={handleEdgeTypeChange}
+
+        selectedEdgeDirection={selectedEdgeDirection}
+        handleEdgeDirectionChange={handleEdgeDirectionChange}
+        selectedLineStyle={selectedLineStyle}
+        handleLineStyleChange={handleLineStyleChange}
+        applyEdgeChanges={applyEdgeChanges}
+        tooltip={tooltip}
+        tooltipContent={tooltipContent}
+        edgeTooltip={edgeTooltip}
+        edgeTooltipContent={edgeTooltipContent}
+        selectedNodes={selectedNodes}
+        startNodeSelection={startNodeSelection}
+        createEdge={createEdge}
+        createAutomaticEdges={createAutomaticEdges}
+      />
+      
+      
+       
     </div>
   );
 };
