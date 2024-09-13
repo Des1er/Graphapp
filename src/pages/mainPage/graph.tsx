@@ -22,7 +22,8 @@ const GraphComponent: React.FC = () => {
 
   const [selectedNode, setSelectedNode] = useState<cytoscape.NodeSingular | null>(null);
   const [nodeColor, setNodeColor] = useState<string>('#666');
-  const [nodeShape, setNodeShape] = useState<string>('');
+  const [nodeShape, setNodeShape] = useState<'ellipse' | 'triangle' | 'rectangle' | 'diamond'>('ellipse');
+
   const [elements, setElements] = useState<cytoscape.ElementDefinition[]>(CytoscapeComponent.normalizeElements(initialData));
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
@@ -334,7 +335,7 @@ const GraphComponent: React.FC = () => {
   };
 
   const handleNodeShapeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setNodeShape(event.target.value);
+    setNodeShape(event.target.value as 'ellipse' | 'triangle' | 'rectangle' | 'diamond');
 };
 
 
@@ -423,7 +424,7 @@ const GraphComponent: React.FC = () => {
         showNodeEditor={showNodeEditor}
         nodeColor={nodeColor}
         handleNodeColorChange={handleNodeColorChange}
-     
+        nodeShape={nodeShape}
         handleNodeShapeChange={handleNodeShapeChange}
         applyNodeChanges={applyNodeChanges}
         showEdgeEditor={showEdgeEditor}

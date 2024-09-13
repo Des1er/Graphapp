@@ -2,6 +2,7 @@ import React from 'react';
 import NodeSettings from '../../../entities/enditNode/ui/NodeSettings.tsx';
 import EdgeSettings from '../../../entities/editEdge/ui/EdgeSettings.tsx';
 import { GraphUIProps } from '../model/types.tsx';
+import styles from './ui.module.scss';
 
 
 
@@ -39,7 +40,7 @@ const GraphUI: React.FC<GraphUIProps> = ({
     <>
       <button
         onClick={toggleFullScreen}
-        className="absolute bottom-9 right-4 p-2 bg-blue-500 text-white rounded shadow"
+        className={styles.fullScreen}
         title="Toggle Full Screen"
       >
         {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
@@ -49,7 +50,7 @@ const GraphUI: React.FC<GraphUIProps> = ({
 
       {tooltip && (
         <div
-          className="absolute left-10 top-10 bg-black text-white p-1 rounded pointer-events-none"
+          className={styles.content}
           style={{ left: tooltip.x + 10, top: tooltip.y + 10 }}
         >
           {tooltipContent}
@@ -58,52 +59,52 @@ const GraphUI: React.FC<GraphUIProps> = ({
 
       {edgeTooltip && (
         <div
-          className="absolute left-10 top-10 bg-black text-white p-1 rounded pointer-events-none"
+          className={styles.edgeInfo}
           style={{ left: edgeTooltip.x + 10, top: edgeTooltip.y + 10 }}
         >
           {edgeTooltipContent}
         </div>
       )}
 
-      <div className="absolute top-2 right-1 w-72 p-2 border border-gray-300 bg-white" title="Control Panel">
+      <div className={styles.controlpanel} title="Control Panel">
         <div className="flex flex-col gap-2">
-          <button onClick={startNodeSelection} className="p-2 bg-blue-500 text-white rounded">
+          <button onClick={startNodeSelection} className={styles.selectnodes}>
             Select Nodes to Create Edge
           </button>
-          <button onClick={createEdge} disabled={selectedNodes.length < 2} className="p-2 bg-blue-500 text-white rounded">
+          <button onClick={createEdge} disabled={selectedNodes.length < 2} className={styles.createedge}>
             Create Edge
           </button>
-          <button onClick={createAutomaticEdges} className="p-2 bg-blue-500 text-white rounded">
+          <button onClick={createAutomaticEdges} className={styles.autocreate}>
             Create Automatic Edges
           </button>
           <div>Selected Nodes: {selectedNodes.join(', ')}</div>
-           {showNodeEditor && (
-        <NodeSettings
-          nodeColor={nodeColor}
-          onNodeColorChange={handleNodeColorChange}
-          nodeShape={nodeShape}
-          onNodeShapeChange={handleNodeShapeChange}
-          onApplyChanges={applyNodeChanges}
-        />
-      )}
+          {showNodeEditor && (
+            <NodeSettings
+              nodeColor={nodeColor}
+              onNodeColorChange={handleNodeColorChange}
+              nodeShape={nodeShape}
+              onNodeShapeChange={handleNodeShapeChange}
+              onApplyChanges={applyNodeChanges}
+            />
+          )}
 
-      {showEdgeEditor && (
-        <EdgeSettings
-          edgeThickness={edgeThickness}
-          onThicknessChange={handleThicknessChange}
+          {showEdgeEditor && (
+            <EdgeSettings
+              edgeThickness={edgeThickness}
+              onThicknessChange={handleThicknessChange}
 
-          selectedAttribute={selectedAttribute}
-          onAttributeChange={handleAttributeChange}
+              selectedAttribute={selectedAttribute}
+              onAttributeChange={handleAttributeChange}
 
-          selectedEdgeType={selectedEdgeType}
-          onEdgeTypeChange={handleEdgeTypeChange}
+              selectedEdgeType={selectedEdgeType}
+              onEdgeTypeChange={handleEdgeTypeChange}
 
-          selectedEdgeDirection={selectedEdgeDirection}
-          onEdgeDirectionChange={handleEdgeDirectionChange}
-          selectedLineStyle={selectedLineStyle}
-          onLineStyleChange={handleLineStyleChange}
-          onApplyChanges={applyEdgeChanges}       />
-      )}
+              selectedEdgeDirection={selectedEdgeDirection}
+              onEdgeDirectionChange={handleEdgeDirectionChange}
+              selectedLineStyle={selectedLineStyle}
+              onLineStyleChange={handleLineStyleChange}
+              onApplyChanges={applyEdgeChanges}       />
+          )}
         </div>
       </div>
     </>
