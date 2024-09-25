@@ -1,13 +1,13 @@
-// src/App.js
+
 import React from 'react';
 
 import './tailwind.css';
-import GraphComponent from '../pages/mainPage/graph.tsx';
+import MainPage from '../pages/mainPage/MainPage';
 
 function App() {
   return (
     <div className="App">
-      <GraphComponent />
+      <MainPage />
     </div>
   );
 }

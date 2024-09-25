@@ -1,8 +1,8 @@
 import React from 'react';
-import NodeSettings from '../../../entities/enditNode/ui/NodeSettings.tsx';
-import EdgeSettings from '../../../entities/editEdge/ui/EdgeSettings.tsx';
+import NodeSettings from '../../enditNode/ui/NodeSettings.tsx';
+import EdgeSettings from '../../editEdge/ui/EdgeSettings.tsx';
 import { GraphUIProps } from '../model/types.tsx';
-import styles from './ui.module.scss';
+import styles from './styles.module.scss';
 
 
 

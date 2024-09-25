@@ -1,7 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import screenfull from 'screenfull';
-import GraphUI from './ui/ui.tsx';
+import GraphUI from './ui.tsx';
+import { useGraphHandlers} from './hook.tsx'; 
+import { useAttributeChange } from '../../../hooks/useAttributeChange.ts';
+import { useEdgeTypeChange } from '../../../hooks/useEdgeTypeChange.ts';
+import { useEdgeDirectionChange } from '../../../hooks/useEdgeDirectionChange.ts';
+import { useLineStyleChange } from '../../../hooks/useLineStyleChange.ts';
+import { useEdgeHover } from '../../../hooks/useEdgeHover.ts';
+import { useEdgeUnhover } from '../../../hooks/useEdgeUnhover.ts';
+import { useNodeHover } from '../../../hooks/useNodeHover.ts';
+import { useNodeUnhover } from '../../../hooks/useNodeUnhover.ts';
+import { useNodeColorChange } from '../../../hooks/useNodeColorChange.ts';
+import { useNodeShapeChange } from '../../../hooks/useNodeShapeChange.ts';
+import { useThicknessChange } from '../../../hooks/useThicknessChange.ts';
+import { useNodeClick } from '../../../hooks/useNodeClick.ts';
+import { useEdgeClick } from '../../../hooks/useEdgeClick.ts';
+import { useNodeDragStart } from '../../../hooks/useNodeDragStart.ts';
+import { useNodeDragEnd } from '../../../hooks/useNodeDragEnd.ts';
 
 
 
@@ -23,7 +39,6 @@ const GraphComponent: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<cytoscape.NodeSingular | null>(null);
   const [nodeColor, setNodeColor] = useState<string>('#666');
   const [nodeShape, setNodeShape] = useState<'ellipse' | 'triangle' | 'rectangle' | 'diamond'>('ellipse');
-
   const [elements, setElements] = useState<cytoscape.ElementDefinition[]>(CytoscapeComponent.normalizeElements(initialData));
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
@@ -43,6 +58,100 @@ const GraphComponent: React.FC = () => {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
   const graphContainerRef = useRef<HTMLDivElement | null>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
+  
+  const handleAttributeChange = useAttributeChange(setSelectedAttribute);
+  const handleEdgeTypeChange = useEdgeTypeChange(setSelectedEdgeType);
+  const handleEdgeDirectionChange = useEdgeDirectionChange(setSelectedEdgeDirection);
+  const handleLineStyleChange = useLineStyleChange(setSelectedLineStyle);
+  const handleEdgeHover = useEdgeHover(setEdgeTooltipContent, setEdgeTooltip, cyRef);
+  const handleEdgeUnhover = useEdgeUnhover(setEdgeTooltip);
+  const handleNodeHover = useNodeHover(setTooltipContent, setTooltip);
+  const handleNodeUnhover = useNodeUnhover(setTooltip);
+  const handleNodeColorChange = useNodeColorChange(setNodeColor);
+  const handleNodeShapeChange = useNodeShapeChange(setNodeShape);
+  const handleThicknessChange = useThicknessChange(setEdgeThickness);
+  const handleNodeClick = useNodeClick(
+    setSelectedNode,
+    setNodeColor,
+    setNodeShape,
+    setSelectedNodes,
+    setShowNodeEditor,
+    setShowEdgeEditor,
+    isSelecting
+  );
+
+  const handleEdgeClick = useEdgeClick(
+    setSelectedEdge,
+    setSelectedAttribute,
+    setSelectedEdgeType,
+    setSelectedEdgeDirection,
+    setSelectedLineStyle,
+    setEdgeThickness,
+    setIsSelecting,
+    setShowNodeEditor,
+    setShowEdgeEditor
+  );
+
+  const handleNodeDragStart = useNodeDragStart(setDraggingNode);
+
+  const handleNodeDragEnd = useNodeDragEnd(
+    draggingNode,
+    setDraggingNode,
+    setElements,
+    edgeThickness,
+    selectedEdgeType,
+    selectedAttribute,
+    selectedEdgeDirection,
+    selectedLineStyle
+  );
+
+
+
+  // const {
+  //   handleAttributeChange,
+  //   handleEdgeTypeChange,
+  //   handleEdgeDirectionChange,
+  //   handleLineStyleChange,
+  //   handleEdgeHover,
+  //   handleEdgeUnhover,
+  //   handleNodeHover,
+  //   handleNodeUnhover,
+  //   handleNodeColorChange,
+  //   handleNodeShapeChange,
+  //   handleThicknessChange,
+  //   handleNodeClick,
+  //   handleEdgeClick,
+  //   handleNodeDragStart, 
+  //   handleNodeDragEnd 
+  // } = useGraphHandlers(
+  //   setDraggingNode,
+  //   draggingNode,
+  //   edgeThickness,
+  //   selectedEdgeType,
+  //   selectedAttribute,
+  //   selectedEdgeDirection,
+  //   selectedLineStyle,
+  //   setElements,
+  //   setSelectedEdge,
+  //   setSelectedEdgeType,
+  //   setSelectedEdgeDirection,
+  //   setSelectedLineStyle,
+  //   setEdgeThickness,
+  //   setSelectedNode,
+  //   setNodeColor,
+  //   setNodeShape,
+  //   isSelecting,
+  //   setIsSelecting,
+  //   setShowNodeEditor,
+  //   setShowEdgeEditor,
+  //   setSelectedNodes,
+  //   setSelectedAttribute,
+  //   setEdgeTooltipContent,
+  //   setEdgeTooltip,
+  //   setTooltipContent,
+  //   setTooltip,
+  // );
+
 
   const toggleFullScreen = () => {
     if (screenfull.isEnabled) {
@@ -89,41 +198,41 @@ const GraphComponent: React.FC = () => {
     }
   }, [cyRef.current, draggingNode, isSelecting]);
 
-  const handleNodeClick = (event: cytoscape.EventObject) => {
-    const node = event.target;
-    setSelectedNode(node);
-    setNodeColor(node.style('background-color'));
-    setNodeShape(node.style('shape'));
-    if (isSelecting) {
-      const nodeId = event.target.id();
-      setSelectedNodes(prevSelectedNodes => {
-        if (prevSelectedNodes.includes(nodeId)) {
-          return prevSelectedNodes;
-        } else if (prevSelectedNodes.length === 2) {
-          return [nodeId];
-        } else {
-          return [...prevSelectedNodes, nodeId];
-        }
-      });
-    }
-    else {
-      setShowNodeEditor(true);
-      setShowEdgeEditor(false);
-    }
-  };
+  // const handleNodeClick = (event: cytoscape.EventObject) => {
+  //   const node = event.target;
+  //   setSelectedNode(node);
+  //   setNodeColor(node.style('background-color'));
+  //   setNodeShape(node.style('shape'));
+  //   if (isSelecting) {
+  //     const nodeId = event.target.id();
+  //     setSelectedNodes(prevSelectedNodes => {
+  //       if (prevSelectedNodes.includes(nodeId)) {
+  //         return prevSelectedNodes;
+  //       } else if (prevSelectedNodes.length === 2) {
+  //         return [nodeId];
+  //       } else {
+  //         return [...prevSelectedNodes, nodeId];
+  //       }
+  //     });
+  //   }
+  //   else {
+  //     setShowNodeEditor(true);
+  //     setShowEdgeEditor(false);
+  //   }
+  // };
 
-  const handleEdgeClick = (event: cytoscape.EventObject) => {
-    const edge = event.target;
-    setSelectedEdge(edge);
-    setSelectedAttribute(edge.data('attribute') || '');
-    setSelectedEdgeType(edge.data('type') || '');
-    setSelectedEdgeDirection(edge.data('direction') || '');
-    setSelectedLineStyle(edge.data('lineStyle') || '');
-    setEdgeThickness(edge.data('width'));
-    setIsSelecting(false);
-    setShowNodeEditor(false);
-    setShowEdgeEditor(true);
-  };
+  // const handleEdgeClick = (event: cytoscape.EventObject) => {
+  //   const edge = event.target;
+  //   setSelectedEdge(edge);
+  //   setSelectedAttribute(edge.data('attribute') || '');
+  //   setSelectedEdgeType(edge.data('type') || '');
+  //   setSelectedEdgeDirection(edge.data('direction') || '');
+  //   setSelectedLineStyle(edge.data('lineStyle') || '');
+  //   setEdgeThickness(edge.data('width'));
+  //   setIsSelecting(false);
+  //   setShowNodeEditor(false);
+  //   setShowEdgeEditor(true);
+  // };
 
   const startNodeSelection = () => {
     setIsSelecting(true);
@@ -132,31 +241,31 @@ const GraphComponent: React.FC = () => {
     setShowEdgeEditor(false);
   };
 
-  const handleNodeDragStart = (event: cytoscape.EventObject) => {
-    const node = event.target;
-    setDraggingNode(node);
-  };
+  // const handleNodeDragStart = (event: cytoscape.EventObject) => {
+  //   const node = event.target;
+  //   setDraggingNode(node);
+  // };
 
-  const handleNodeDragEnd = (event: cytoscape.EventObject) => {
-    const node = event.target;
+  // const handleNodeDragEnd = (event: cytoscape.EventObject) => {
+  //   const node = event.target;
 
-    if (draggingNode && draggingNode.id() !== node.id()) {
-      const newEdge = {
-        data: {
-          source: draggingNode.id(),
-          target: node.id(),
-          width: edgeThickness,
-          type: selectedEdgeType || 'dependency',
-          attribute: selectedAttribute || '',
-          direction: selectedEdgeDirection || 'forward',
-          lineStyle: selectedLineStyle || 'solid',
-          label: 'New Edge'
-        }
-      };
-      setElements(prevElements => [...prevElements, newEdge]);
-    }
-    setDraggingNode(null);
-  };
+  //   if (draggingNode && draggingNode.id() !== node.id()) {
+  //     const newEdge = {
+  //       data: {
+  //         source: draggingNode.id(),
+  //         target: node.id(),
+  //         width: edgeThickness,
+  //         type: selectedEdgeType || 'dependency',
+  //         attribute: selectedAttribute || '',
+  //         direction: selectedEdgeDirection || 'forward',
+  //         lineStyle: selectedLineStyle || 'solid',
+  //         label: 'New Edge'
+  //       }
+  //     };
+  //     setElements(prevElements => [...prevElements, newEdge]);
+  //   }
+  //   setDraggingNode(null);
+  // };
 
   const createEdge = () => {
     if (selectedNodes.length === 2) {
@@ -201,19 +310,11 @@ const GraphComponent: React.FC = () => {
     }
   };
 
-  const handleNodeHover = (event: cytoscape.EventObject) => {
-    const node = event.target;
-    setTooltipContent(`ID: ${node.id()}, Label: ${node.data('label')}`);
-    setTooltip({ x: event.renderedPosition.x, y: event.renderedPosition.y });
-  };
 
-  const handleNodeUnhover = () => {
-    setTooltip(null);
-  };
 
-  const handleThicknessChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEdgeThickness(Number(event.target.value));
-  };
+  // const handleThicknessChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setEdgeThickness(Number(event.target.value));
+  // };
 
   const createAutomaticEdges = () => {
     const nodes = initialData.nodes;
@@ -274,21 +375,21 @@ const GraphComponent: React.FC = () => {
     setElements(prevElements => [...prevElements, ...edgesToAdd]);
   };
 
-  const handleAttributeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedAttribute(event.target.value);
-  };
+  // const handleAttributeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedAttribute(event.target.value);
+  // };
 
-  const handleEdgeTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedEdgeType(event.target.value);
-  };
+  // const handleEdgeTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedEdgeType(event.target.value);
+  // };
 
-  const handleEdgeDirectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedEdgeDirection(event.target.value);
-  };
+  // const handleEdgeDirectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedEdgeDirection(event.target.value);
+  // };
 
-  const handleLineStyleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedLineStyle(event.target.value);
-  };
+  // const handleLineStyleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedLineStyle(event.target.value);
+  // };
 
   const applyNodeChanges = () => {
     if (selectedNode) {
@@ -313,30 +414,40 @@ const GraphComponent: React.FC = () => {
     }
   };
 
-  const handleEdgeHover = (event: cytoscape.EventObject) => {
-    const edge = event.target;
-    const sourceNode = cyRef.current?.getElementById(edge.data('source'));
-    const targetNode = cyRef.current?.getElementById(edge.data('target'));
+  // const handleEdgeHover = (event: cytoscape.EventObject) => {
+  //   const edge = event.target;
+  //   const sourceNode = cyRef.current?.getElementById(edge.data('source'));
+  //   const targetNode = cyRef.current?.getElementById(edge.data('target'));
 
-    const sourceLabel = sourceNode?.data('label');
-    const targetLabel = targetNode?.data('label');
-    const attribute = edge.data('attribute');
+  //   const sourceLabel = sourceNode?.data('label');
+  //   const targetLabel = targetNode?.data('label');
+  //   const attribute = edge.data('attribute');
 
-    setEdgeTooltipContent(`From: ${sourceLabel}\nTo: ${targetLabel}\nAttribute: ${attribute}`);
-    setEdgeTooltip({ x: event.renderedPosition.x, y: event.renderedPosition.y });
-  };
+  //   setEdgeTooltipContent(`From: ${sourceLabel}\nTo: ${targetLabel}\nAttribute: ${attribute}`);
+  //   setEdgeTooltip({ x: event.renderedPosition.x, y: event.renderedPosition.y });
+  // };
 
-  const handleEdgeUnhover = () => {
-    setEdgeTooltip(null);
-  };
+//   const handleEdgeUnhover = () => {
+//     setEdgeTooltip(null);
+//   };
 
-  const handleNodeColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNodeColor(event.target.value);
-  };
+//   const handleNodeHover = (event: cytoscape.EventObject) => {
+//     const node = event.target;
+//     setTooltipContent(`ID: ${node.id()}, Label: ${node.data('label')}`);
+//     setTooltip({ x: event.renderedPosition.x, y: event.renderedPosition.y });
+//   };
 
-  const handleNodeShapeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setNodeShape(event.target.value as 'ellipse' | 'triangle' | 'rectangle' | 'diamond');
-};
+//   const handleNodeUnhover = () => {
+//     setTooltip(null);
+//   };
+
+//   const handleNodeColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     setNodeColor(event.target.value);
+//   };
+
+//   const handleNodeShapeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+//     setNodeShape(event.target.value as 'ellipse' | 'triangle' | 'rectangle' | 'diamond');
+// };
 
 
   return (
@@ -430,13 +541,10 @@ const GraphComponent: React.FC = () => {
         showEdgeEditor={showEdgeEditor}
         edgeThickness={edgeThickness}
         handleThicknessChange={handleThicknessChange}
-
         selectedAttribute={selectedAttribute}
         handleAttributeChange={handleAttributeChange}
-
         selectedEdgeType={selectedEdgeType}
         handleEdgeTypeChange={handleEdgeTypeChange}
-
         selectedEdgeDirection={selectedEdgeDirection}
         handleEdgeDirectionChange={handleEdgeDirectionChange}
         selectedLineStyle={selectedLineStyle}
